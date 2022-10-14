@@ -1,0 +1,36 @@
+Cypress tests with docker
+Docker is a virtual environment, it creates a virtual environment inside containers and we can customize these containers according to our testing requirement.
+Docker is lightweight as one container will use one process to run, docker builds its container automatically with the help of base code, and containers are reusable.
+We can run Cypress in Docker - for cross-browser testing becomes easy, the reuse of containers, parallel testing,  and can customize these containers according to our testing requirement.
+
+IMAGE - A Docker image is a read-only template that contains a set of instructions for creating a container that can run on the Docker platform
+CONTAINER -  A container is a runnable instance of an image. Each container is based on an image, and we can create, start, stop, move, or delete a container
+
+STEP 1 - Should have a Working Cypress Project and Docker setup on local machine.
+Refer to the link https://docs.docker.com/engine/install/
+STEP 2 - Create a Dockerfile to build an image for your Project. 
+Not built Docker images from scratch, used an existing Cypress Docker images.
+GitHub page for Docker images https://github.com/cypress-io/cypress-docker-images.
+Picked cypress/included as it has all operating system dependencies, Cypress, and some browsers installed globally. 
+This image has Debian GNU/Linux 10 (buster) Operating System.
+                FROM cypress/included:6.8.0
+                RUN mkdir /cypress-docker
+                WORKDIR /cypress-docker
+                COPY ./package.json .
+                COPY ./package-lock.json .
+                COPY ./cypress.json .
+                COPY ./cypress ./cypress
+                RUN npm install
+                ENTRYPOINT ["npm", "run"]
+Build an image, CMD - docker build -t cypress-docker-mocha-report .
+
+
+STEP 3 - Create a docker-compose.yml file. This will allow us to run cypress on different browsers with just one command, CMD: docker-compose run e2e-chrome.
+
+//container will execute Cypress test using individual browsers
+docker-compose run e2e-chrome
+docker-compose run e2e-firefox
+docker-compose run e2e-test  //for Electron browser
+docker-compose run e2e-edge
+//container will execute parallel Cypress test in all browser
+docker-compose up 
